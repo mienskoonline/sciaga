@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Miensko – jak przechowywać i przygotować</title><meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f2ee;--card:#fff;--fg:#151515;--mut:#6d6a64;--line:#e7e3dc;--soft:#f6f5f1;--hl:#2f7d55}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+.w{max-width:680px;margin:0 auto;padding:0 16px 40px}
+.bar{background:#fff;text-align:center;padding:8px 16px;border-bottom:1px solid var(--line)}.bar a{display:inline-block}.lg{height:56px;width:auto;display:block}
+.logo{font-weight:700;font-size:22px;color:#151515}.logo span{color:var(--hl)}
+.top{background:#151515;color:#fff;padding:22px 16px 26px}.top .w{padding-bottom:0}
+h1{font-size:28px;line-height:1.2;margin:4px 0 8px;font-weight:700}.pod{color:#d6d3cd;margin:0;font-size:15px}
+.lista{margin-top:-14px}
+.karta{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 18px 8px;margin:14px 0;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.karta.wyr{border:2px solid var(--hl);box-shadow:0 6px 24px rgba(47,125,85,.12)}
+.kh{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+.zdj{width:64px;height:64px;border-radius:12px;object-fit:cover;flex:0 0 64px;background:var(--soft)}
+.karta h2{font-size:18px;line-height:1.3;margin:0;font-weight:700}
+.blok{background:var(--soft);border-radius:12px;padding:12px 14px;margin:0 0 10px}
+.et{font-weight:700;font-size:13px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.6px;color:var(--hl)}
+.blok p{margin:0;font-size:15px;color:#2b2a27}
+.sek{font-size:14px;text-transform:uppercase;letter-spacing:.8px;color:var(--mut);margin:30px 2px 4px;font-weight:600}
+.info{color:var(--mut);font-size:14px;text-align:center;margin:22px 0 0}
+.stopka{text-align:center;margin-top:26px;padding-top:20px;border-top:1px solid var(--line);font-size:15px}
+.stopka a{color:var(--fg);font-weight:600;text-decoration:none}
+.btn{display:inline-block;margin-top:14px;background:#151515;color:#fff!important;padding:12px 22px;border-radius:10px;text-decoration:none;font-weight:600}
+.pusto{background:var(--card);border-radius:16px;padding:24px;text-align:center}
+@media(max-width:480px){h1{font-size:24px}.karta{padding:16px 14px 6px}.zdj{width:56px;height:56px;flex-basis:56px}}
+</style></head><body>
+<div class="bar"><a href="https://miensko.pl" id="logo"><span class="logo">miensko<span>.pl</span></span></a></div>
+<div class="top"><div class="w"><h1 id="tyt"></h1><p class="pod" id="pod"></p></div></div>
+<main class="w lista"><div id="karty"></div><p class="info" id="data"></p>
+<div class="stopka"><span id="pyt"></span><br><a href="mailto:kontakt@miensko.pl">kontakt@miensko.pl</a> · <a href="tel:+48791134200">791 134 200</a><br><a class="btn" href="https://miensko.pl" id="sklep"></a></div></main>
+<script>
+var LOGO_URL = '';   // adres logo sklepu (png/jpg) – gdy pusty, pokazuje się napis miensko.pl
+var q = new URLSearchParams(location.search), ua = (q.get('l') || '').toLowerCase() === 'ua';
+var T = ua ? {tyt:'Шпаргалка до вашого замовлення',pod:'Як зберігати й готувати продукти, які до вас їдуть. Збережіть цю сторінку – знадобиться, коли розпакуєте посилку.',inne:'Інші продукти із замовлення',brak:'Не знайшли продуктів. Напишіть нам – підкажемо.',data:'Точна дата придатності вказана на етикетці кожного продукту.',pyt:'Маєте питання?',sklep:'До магазину',h1:'Як зберігати',h2:'Як приготувати'}
+ : {tyt:'Ściąga do Twojego zamówienia',pod:'Jak przechowywać i przygotować produkty, które do Ciebie jadą. Zachowaj tę stronę – przyda się, gdy rozpakujesz paczkę.',inne:'Pozostałe produkty z zamówienia',brak:'Nie znaleźliśmy produktów. Napisz do nas – podpowiemy.',data:'Dokładna data przydatności jest na etykiecie każdego produktu.',pyt:'Masz pytania?',sklep:'Przejdź do sklepu',h1:'Jak przechowywać',h2:'Jak przygotować'};
+document.documentElement.lang = ua ? 'uk' : 'pl';
+if (ua) document.title = 'Miensko – як зберігати й готувати';
+['tyt','pod','data','pyt','sklep'].forEach(function(k){document.getElementById(k).textContent=T[k];});
+if (LOGO_URL) document.getElementById('logo').innerHTML = '<img class="lg" alt="miensko.pl" src="'+LOGO_URL+'">';
+function esc(s){return String(s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+fetch('dane.json').then(function(r){return r.json();}).then(function(D){
+  var ids=(q.get('p')||'').split(',').map(function(x){return x.replace(/\D/g,'');}).filter(function(x){return x&&D[x];});
+  var f=(q.get('f')||'').replace(/\D/g,''), kol=[], wyb=!!(f&&D[f]);
+  if(wyb) kol.push(f); ids.forEach(function(x){if(kol.indexOf(x)<0)kol.push(x);});
+  var h='';
+  if(!kol.length) h='<p class="pusto">'+T.brak+'</p>';
+  kol.forEach(function(id,i){
+    var x=D[id], t=ua?x.ua:x.pl, n=ua?x.nu:x.n;
+    if(i===1&&wyb) h+='<h3 class="sek">'+T.inne+'</h3>';
+    h+='<article class="karta'+(i===0&&wyb?' wyr':'')+'"><header class="kh">'+(x.i?'<img class="zdj" alt="" src="'+esc(x.i)+'">':'<div class="zdj"></div>')+'<h2>'+esc(n)+'</h2></header>'
+     +'<section class="blok"><div class="et">'+T.h1+'</div><p>'+esc(t.p)+'</p></section>'
+     +'<section class="blok"><div class="et">'+T.h2+'</div><p>'+esc(t.g)+'</p></section></article>';
+  });
+  document.getElementById('karty').innerHTML=h;
+}).catch(function(){document.getElementById('karty').innerHTML='<p class="pusto">'+T.brak+'</p>';});
+</script></body></html>
